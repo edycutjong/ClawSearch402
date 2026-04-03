@@ -296,7 +296,6 @@ export default function Dashboard() {
             <ConfigRow label="Network" value="Stellar Testnet" />
             <ConfigRow label="Token" value="USDC (Native)" />
             <ConfigRow label="Protocol" value="x402 (L4 Payment Required)" />
-            <ConfigRow label="Receiver Wallet" value={stats.payTo ? `${stats.payTo.slice(0, 5)}...${stats.payTo.slice(-5)}` : "Loading..."} isCode />
             <ConfigRow label="Search Base Price" value="$0.001 USDC" />
             <ConfigRow label="Enriched Price" value="$0.005 USDC" />
             <ConfigRow label="Node URL" value={PROXY_URL} isCode />
