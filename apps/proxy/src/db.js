@@ -102,7 +102,7 @@ export function getRecent(limit = 50) {
       endpoint,
       result_count as resultCount,
       latency_ms as latencyMs,
-      created_at as timestamp
+      replace(created_at, ' ', 'T') || 'Z' as timestamp
     FROM payments
     ORDER BY created_at DESC
     LIMIT ?
