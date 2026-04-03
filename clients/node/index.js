@@ -15,7 +15,7 @@
 import "dotenv/config";
 import { wrapFetchWithPayment } from "@x402/fetch";
 import { x402Client } from "@x402/core/client";
-import { ExactStellarClient } from "@x402/stellar";
+import { ExactStellarScheme } from "@x402/stellar/exact/client";
 import { createEd25519Signer } from "@x402/stellar";
 
 // ── Configuration ────────────────────────────────────────
@@ -31,7 +31,7 @@ if (!PRIVATE_KEY) {
 // ── Setup x402 Client ────────────────────────────────────
 const signer = createEd25519Signer(PRIVATE_KEY, "stellar:testnet");
 const client = new x402Client()
-  .register("stellar:*", new ExactStellarClient(signer));
+  .register("stellar:*", new ExactStellarScheme(signer));
 
 const fetchWithPayment = wrapFetchWithPayment(fetch, client);
 
