@@ -55,6 +55,7 @@ export default function Dashboard() {
   const [recent, setRecent] = useState<PaymentRecord[]>([]);
   const [connected, setConnected] = useState(false);
   const [activeClients, setActiveClients] = useState(0);
+  const [timeRange, setTimeRange] = useState<"30m" | "24h">("24h");
 
   useEffect(() => {
     fetch(`${PROXY_URL}/api/stats`)
@@ -117,22 +118,37 @@ export default function Dashboard() {
     const buckets: Record<string, number> = {};
     const now = new Date();
     
-    for (let i = 0; i < 30; i++) {
-      const d = new Date(now.getTime() - i * 60000);
-      buckets[format(d, "HH:mm")] = 0;
-    }
-    
-    recent.forEach(r => {
-      const key = format(new Date(r.timestamp), "HH:mm");
-      if (buckets[key] !== undefined) {
-        buckets[key] += r.amount;
+    if (timeRange === "30m") {
+      for (let i = 0; i < 30; i++) {
+        const d = new Date(now.getTime() - i * 60000);
+        buckets[format(d, "HH:mm")] = 0;
       }
-    });
+      
+      recent.forEach(r => {
+        const key = format(new Date(r.timestamp), "HH:mm");
+        if (buckets[key] !== undefined) {
+          buckets[key] += r.amount;
+        }
+      });
+    } else {
+      // 24 hours, grouped by hour
+      for (let i = 0; i < 24; i++) {
+        const d = new Date(now.getTime() - i * 3600000);
+        buckets[format(d, "HH:00")] = 0;
+      }
+      
+      recent.forEach(r => {
+        const key = format(new Date(r.timestamp), "HH:00");
+        if (buckets[key] !== undefined) {
+          buckets[key] += r.amount;
+        }
+      });
+    }
     
     return Object.entries(buckets)
       .map(([time, revenue]) => ({ time, revenue }))
       .reverse();
-  }, [recent]);
+  }, [recent, timeRange]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -226,9 +242,13 @@ export default function Dashboard() {
               <Activity className="w-5 h-5 text-cyan-400" />
               Revenue Velocity
             </h2>
-            <select className="bg-slate-900/50 backdrop-blur-sm border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 font-medium hover:border-emerald-500/50 transition-colors focus:outline-none">
-              <option>Last 30 Min</option>
-              <option>Last 24 Hours</option>
+            <select 
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value as "30m" | "24h")}
+              className="bg-slate-900/50 backdrop-blur-sm border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 font-medium hover:border-emerald-500/50 transition-colors focus:outline-none"
+            >
+              <option value="30m">Last 30 Min</option>
+              <option value="24h">Last 24 Hours</option>
             </select>
           </div>
           <div className="h-[300px] w-full relative">
