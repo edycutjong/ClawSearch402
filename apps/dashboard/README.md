@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ClawSearch 402 Dashboard
+
+This is the Next.js frontend dashboard for the **ClawSearch 402** architecture. It provides real-time insights, metrics, and visualization of the proxy's performance and revenue generation via the Stellar USDC X-402 protocol.
+
+## Features
+
+- **Live Activity Feed**: Monitor incoming search requests in real-time as they hit the proxy.
+- **Revenue Dashboard**: Track USDC earnings and micropayment accumulations.
+- **Search Analytics**: View request volume, token usage, and system health.
+- **Docker Ready**: Pre-configured to build as a standalone lightweight Docker container alongside the rest of the stack.
 
 ## Getting Started
 
-First, run the development server:
+Because this dashboard is part of the ClawSearch monorepo, the easiest way to run it is from the root of the project using the unified npm scripts.
+
+### Option A: From Project Root (Recommended)
 
 ```bash
+# Returns to the root monorepo directory
+cd ../../
+
+# Run the entire stack concurrently (Proxy + Dashboard)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Or run just the dashboard independently
+npm run dashboard
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Option B: From This Directory
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+If you are working strictly within `apps/dashboard`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the live dashboard.
 
-To learn more about Next.js, take a look at the following resources:
+## Deployment & Dockerization
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This app uses Next.js 14 structured with the Modern `app/` router and Tailwind CSS.
+It is configured via `next.config.ts` to output a `standalone` build. This allows it to be bundled into an ultra-lean Docker runner.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To deploy it via Docker alongside the proxy and SearXNG search engine, simply return to the root of the project and execute:
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run docker:up
+```
