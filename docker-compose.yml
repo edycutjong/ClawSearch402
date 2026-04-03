@@ -1,0 +1,54 @@
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Required if fetching any server-side info on load, but purely client-side SSE doesn't need it at build
+      - NODE_ENV=production
+    restart: unless-stopped
+    depends_on:
+      - proxy
+
+  proxy:
+    build:
+      context: .
+      dockerfile: apps/proxy/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - CORS_ORIGIN=*
+      - SEARCH_PROVIDER=searxng
+      # Point internal proxy traffic to the SearXNG sidecar! 
+      - SEARXNG_URL=http://searxng:8080
+      - DASHBOARD_URL=http://localhost:3000
+    env_file:
+      - apps/proxy/.env
+    volumes:
+      - proxy_data:/app/apps/proxy/data
+    restart: unless-stopped
+    depends_on:
+      - searxng
+
+  searxng:
+    image: searxng/searxng:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - searxng_data:/etc/searxng
+    environment:
+      - BASE_URL=http://localhost:8080/
+      - INSTANCE_NAME=clawsearch-local
+    restart: unless-stopped
+    # Use a basic command override to allow json format (otherwise searxng default blocks API format)
+    command: >
+      sh -c "sed -i 's/- html/- html\n    - json/' /usr/local/searxng/settings.yml && 
+             sed -i 's/limiter: true/limiter: false/' /usr/local/searxng/settings.yml && 
+             /usr/local/searxng/dockerfiles/docker-entrypoint.sh"
+
+volumes:
+  proxy_data:
+  searxng_data:
