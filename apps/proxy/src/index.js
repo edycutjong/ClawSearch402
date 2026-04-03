@@ -1,8 +1,9 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { x402Middleware } from "@x402/server/express";
-import { ExactStellarServer } from "@x402/stellar";
+import { paymentMiddlewareFromConfig } from "@x402/express";
+import { HTTPFacilitatorClient } from "@x402/core/server";
+import { ExactStellarScheme } from "@x402/stellar/exact/server";
 import { initDB, logPayment, getStats, getRecent } from "./db.js";
 import { search } from "./search.js";
 import { emitPaymentEvent, sseHandler } from "./events.js";
@@ -26,31 +27,37 @@ app.use(express.json());
 // ── x402 Payment Routes ──────────────────────────────────
 const routes = {
   "GET /search": {
-    scheme: "exact",
-    network: "stellar:testnet",
-    payTo: PAY_TO,
-    price: "$0.001",
+    accepts: [
+      {
+        network: "stellar:testnet",
+        scheme: "exact",
+        price: "0.001",
+        payTo: PAY_TO,
+      },
+    ],
     description: "Web search — 10 results (titles, URLs, snippets)",
     mimeType: "application/json",
   },
   "GET /search/enriched": {
-    scheme: "exact",
-    network: "stellar:testnet",
-    payTo: PAY_TO,
-    price: "$0.005",
+    accepts: [
+      {
+        network: "stellar:testnet",
+        scheme: "exact",
+        price: "0.005",
+        payTo: PAY_TO,
+      },
+    ],
     description: "Enriched web search — metadata, favicons, full snippets",
     mimeType: "application/json",
   },
 };
 
 app.use(
-  x402Middleware({
+  paymentMiddlewareFromConfig(
     routes,
-    facilitatorUrl: FACILITATOR_URL,
-    servers: {
-      "stellar:testnet": new ExactStellarServer(),
-    },
-  })
+    new HTTPFacilitatorClient(FACILITATOR_URL),
+    [{ network: "stellar:testnet", server: new ExactStellarScheme() }]
+  )
 );
 
 // ── Init Database ────────────────────────────────────────
@@ -225,11 +232,12 @@ app.get("/.well-known/x402", (_req, res) => {
     network: "stellar:testnet",
     routes: Object.entries(routes).map(([route, config]) => {
       const [method, path] = route.split(" ");
+      const paymentOption = Array.isArray(config.accepts) ? config.accepts[0] : config.accepts;
       return {
         method,
         path,
-        scheme: config.scheme,
-        price: config.price,
+        scheme: paymentOption.scheme,
+        price: paymentOption.price,
         description: config.description,
         mimeType: config.mimeType,
       };
