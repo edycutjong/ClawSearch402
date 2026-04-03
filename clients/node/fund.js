@@ -30,7 +30,7 @@ async function fundAndTrust(secretKey, name) {
   // 2. Add Trustline for USDC
   try {
     const account = await server.loadAccount(publicKey);
-    
+
     // Check if trustline already exists
     const hasTrustline = account.balances.some(b => b.asset_code === 'USDC' && b.asset_issuer === USDC_ISSUER);
     if (hasTrustline) {
@@ -63,11 +63,60 @@ async function fundAndTrust(secretKey, name) {
 }
 
 async function run() {
-  const clientKey = 'SB3VKZOSJM6SYSLFH73WLTA2ZVZBEESPTUHSPYELHETVKF6P3R4AF5GD';
-  const proxyKey = 'SDUUD4WECOMWHA27MRKQRIK4IA7IRCNSB2CEPIBJWVKJTZD4QB4EOSRW';
+  console.log("Generating new testnet keypairs...\n");
   
-  await fundAndTrust(clientKey, "Client");
-  await fundAndTrust(proxyKey, "Proxy"); 
+  const clientKeypair = Keypair.random();
+  const proxyKeypair = Keypair.random();
+
+  const clientSecret = clientKeypair.secret();
+  const proxySecret = proxyKeypair.secret();
+  const proxyPublic = proxyKeypair.publicKey();
+
+  await fundAndTrust(clientSecret, "Client");
+  console.log("---");
+  await fundAndTrust(proxySecret, "Proxy"); 
+
+  if (!process.env.SPONSOR_PRIVATE_KEY) {
+    console.log("\n⚠️  No SPONSOR_PRIVATE_KEY found in .env. Skipping 1.0 USDC funding test.");
+    console.log("   (Your accounts have Trustlines and XLM, but lack the USDC required to search!)");
+  } else {
+    console.log("\nFunding Client with 1.0 testnet USDC from Sponsor Account...");
+    try {
+      const sponsorKeypair = Keypair.fromSecret(process.env.SPONSOR_PRIVATE_KEY);
+      const sponsorAcc = await server.loadAccount(sponsorKeypair.publicKey());
+      
+      const tx = new TransactionBuilder(sponsorAcc, {
+        fee: '100',
+        networkPassphrase: Networks.TESTNET
+      })
+        .addOperation(Operation.payment({
+          destination: clientKeypair.publicKey(),
+          asset: USDC_ASSET,
+          amount: "1.0000000"
+        }))
+        .setTimeout(30)
+        .build();
+
+      tx.sign(sponsorKeypair);
+      await server.submitTransaction(tx);
+      console.log("✅ Client successfully received 1.0 testnet USDC for testing!");
+    } catch (e) {
+      console.error("❌ Failed to sponsor USDC to the client:", e);
+    }
+  }
+
+  console.log("\n=======================================================");
+  console.log("🎉 SUCCESS! Your testnet accounts are funded and ready.");
+  console.log("=======================================================\n");
+
+  console.log("1️⃣  Update clients/node/.env with the CLIENT secret key:");
+  console.log(`STELLAR_PRIVATE_KEY=${clientSecret}\n`);
+
+  console.log("2️⃣  Update apps/proxy/.env with the PROXY public address (PAY_TO):");
+  console.log(`PAY_TO=${proxyPublic}\n`);
+
+  console.log("⚠️  IMPORTANT: Save your Proxy Secret Key to withdraw your accumulated USDC later!");
+  console.log(`Proxy Secret Key: ${proxySecret}\n`);
 }
 
 run();
