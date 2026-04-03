@@ -1,0 +1,20 @@
+{
+  "name": "@clawsearch/proxy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "@x402/server": "latest",
+    "@x402/stellar": "latest",
+    "@x402/core": "latest",
+    "better-sqlite3": "^11.9.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "uuid": "^11.1.0"
+  }
+}

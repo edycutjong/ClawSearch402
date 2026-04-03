@@ -1,0 +1,17 @@
+{
+  "name": "clawsearch-402",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pay-per-query web search for AI agents — HTTP 402 + Stellar USDC micropayments",
+  "workspaces": [
+    "apps/*",
+    "clients/*"
+  ],
+  "scripts": {
+    "proxy": "npm run dev --workspace=apps/proxy",
+    "dashboard": "npm run dev --workspace=apps/dashboard",
+    "agent": "node clients/node/index.js"
+  },
+  "keywords": ["x402", "stellar", "usdc", "micropayments", "ai-agents", "web-search"],
+  "license": "MIT"
+}

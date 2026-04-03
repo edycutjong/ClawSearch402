@@ -1,0 +1,15 @@
+{
+  "name": "@clawsearch/agent-node",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "search": "node index.js"
+  },
+  "dependencies": {
+    "@x402/fetch": "latest",
+    "@x402/core": "latest",
+    "@x402/stellar": "latest",
+    "dotenv": "^16.5.0"
+  }
+}
