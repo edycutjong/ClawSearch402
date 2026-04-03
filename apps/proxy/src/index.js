@@ -302,7 +302,10 @@ app.get("/health", (_req, res) => {
 
 app.get("/api/stats", (_req, res) => {
   const stats = getStats();
-  res.json(stats);
+  res.json({
+    ...stats,
+    payTo: PAY_TO
+  });
 });
 
 app.get("/api/recent", (req, res) => {
