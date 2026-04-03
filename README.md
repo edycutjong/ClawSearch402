@@ -19,6 +19,19 @@ This project is built using a monorepo structure with Next.js, Express, and Node
 - Rich responses: Retrieve basic search lists or markdown-enriched AI-optimised datasets.
 - Event-streaming capabilities via `SSE` to observe searches in real-time.
 
+## Environment Variables
+
+This project uses `.env` files in two locations: `apps/proxy/.env` and `clients/node/.env`. 
+
+**Proxy (`apps/proxy/.env`)**:
+- `PAY_TO`: The Stellar public address that receives payments. *Auto-generated via `node clients/node/fund.js` or [Stellar Account Creator](https://laboratory.stellar.org/#account-creator).*
+- `FACILITATOR_URL`: The X402 payment verification gateway. *See docs at [x402.org](https://x402.org) or set to your custom facilitator.*
+- `SEARXNG_URL`: The SearXNG backend to query. *Use public instances from [searx.space](https://searx.space/) or host your own.*
+- `BRAVE_API_KEY`: (Optional fallback) *Get a free API key at [brave.com/search/api/](https://brave.com/search/api/).*
+
+**Client (`clients/node/.env`)**:
+- `STELLAR_PRIVATE_KEY`: Agent's secret key for signing payments. *Auto-generated via `node clients/node/fund.js` or [Stellar Account Creator](https://laboratory.stellar.org/#account-creator).*
+
 ## Setup Instructions
 
 ### 1. Generate & Fund Wallets
@@ -45,6 +58,24 @@ Because the `fund.js` script handles everything except generating the actual Tes
 
 ### 3. Start the Server
 
+You have two options to run the stack: Local Node processes or Docker Compose (Recommended).
+
+#### Option A: Docker Compose (Recommended)
+Running through Docker automatically includes a self-hosted `SearXNG` instance, bypassing any third-party rate limits.
+
+```bash
+# Build and start all containers in the background
+npm run docker:up
+
+# View real-time logs
+npm run docker:logs
+
+# Stop all containers
+npm run docker:down
+```
+> **Note on Stopping Docker**: Because Docker runs in the background (`-d`), pressing `Ctrl+C` while viewing logs *only stops the log viewer*. You **must** run `npm run docker:down` to fully kill the proxy, dashboard, and search engine!
+
+#### Option B: Local Native
 ```bash
 # Start all the apps concurrently from the root directory
 npm install
@@ -53,6 +84,7 @@ npm run dev
 # Or start the proxy independently
 npm run proxy
 ```
+> **Note on Stopping Locally**: If you started via `npm run dev`, simply pressing `Ctrl+C` in your terminal *will* successfully kill both the proxy and dashboard processes together.
 
 Your search proxy will listen on `localhost:3001` and your dashboard on `localhost:3000`.
 

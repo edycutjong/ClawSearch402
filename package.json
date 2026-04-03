@@ -11,7 +11,10 @@
     "dev": "npx concurrently \"npm run proxy\" \"npm run dashboard\"",
     "proxy": "npm run dev --workspace=@clawsearch/proxy",
     "dashboard": "npm run dev --workspace=dashboard",
-    "agent": "node clients/node/index.js"
+    "agent": "node clients/node/index.js",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
   },
   "keywords": ["x402", "stellar", "usdc", "micropayments", "ai-agents", "web-search"],
   "license": "MIT"
