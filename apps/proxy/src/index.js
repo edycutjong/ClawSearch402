@@ -21,7 +21,7 @@ if (!PAY_TO) {
 }
 
 // ── Middleware ────────────────────────────────────────────
-app.use(cors({ origin: [DASHBOARD_URL, "http://localhost:3000"] }));
+app.use(cors()); // Allow all origins for dev/hackathon purposes
 app.use(express.json());
 
 // ── x402 Payment Routes ──────────────────────────────────
