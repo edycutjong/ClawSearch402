@@ -7,9 +7,9 @@
     "search": "node index.js"
   },
   "dependencies": {
-    "@x402/fetch": "latest",
-    "@x402/core": "latest",
-    "@x402/stellar": "latest",
+    "@x402/fetch": "^2.9.0",
+    "@x402/core": "^2.9.0",
+    "@x402/stellar": "^2.9.0",
     "dotenv": "^16.5.0"
   }
 }

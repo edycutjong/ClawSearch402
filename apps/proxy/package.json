@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "express": "^5.1.0",
-    "@x402/server": "latest",
-    "@x402/stellar": "latest",
-    "@x402/core": "latest",
+    "@x402/express": "^2.9.0",
+    "@x402/stellar": "^2.9.0",
+    "@x402/core": "^2.9.0",
     "better-sqlite3": "^11.9.1",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
