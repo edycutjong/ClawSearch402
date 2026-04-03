@@ -9,6 +9,8 @@
   ],
   "scripts": {
     "dev": "npx concurrently \"npm run proxy\" \"npm run dashboard\"",
+    "build": "npm run build --workspaces --if-present",
+    "start": "npx concurrently \"npm run start --workspace=@clawsearch/proxy\" \"npm run start --workspace=dashboard\"",
     "proxy": "npm run dev --workspace=@clawsearch/proxy",
     "dashboard": "npm run dev --workspace=dashboard",
     "agent": "node clients/node/index.js",
