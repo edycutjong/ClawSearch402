@@ -45,3 +45,6 @@ coverage/
 
 # Turbo
 .turbo
+
+# Demo Videos
+demo_videos/

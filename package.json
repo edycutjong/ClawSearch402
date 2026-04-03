@@ -18,6 +18,16 @@
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f"
   },
-  "keywords": ["x402", "stellar", "usdc", "micropayments", "ai-agents", "web-search"],
-  "license": "MIT"
+  "keywords": [
+    "x402",
+    "stellar",
+    "usdc",
+    "micropayments",
+    "ai-agents",
+    "web-search"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "playwright": "^1.59.1"
+  }
 }
