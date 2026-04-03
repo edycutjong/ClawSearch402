@@ -56,17 +56,19 @@ export default function Dashboard() {
   const [connected, setConnected] = useState(false);
   const [activeClients, setActiveClients] = useState(0);
   const [timeRange, setTimeRange] = useState<"30m" | "24h">("24h");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     fetch(`${PROXY_URL}/api/stats`)
       .then((res) => res.json())
       .then((data) => setStats(data))
-      .catch(console.error);
+      .catch(() => console.log("Stats API syncing..."));
 
     fetch(`${PROXY_URL}/api/recent?limit=50`)
       .then((res) => res.json())
       .then((data) => setRecent(data))
-      .catch(console.error);
+      .catch(() => console.log("Recent API syncing..."));
 
     const evtSource = new EventSource(`${PROXY_URL}/api/events`);
 
@@ -103,7 +105,7 @@ export default function Dashboard() {
       fetch(`${PROXY_URL}/api/stats`)
         .then((res) => res.json())
         .then((data) => setStats(data))
-        .catch(console.error);
+        .catch(() => {});
     }, 10000);
 
     return () => {
@@ -251,10 +253,11 @@ export default function Dashboard() {
               <option value="24h">Last 24 Hours</option>
             </select>
           </div>
-          <div className="h-[300px] w-full relative">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
-              <LineChart data={chartData}>
-                <defs>
+          <div className="w-full relative">
+            {mounted && (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={chartData}>
+                  <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
@@ -301,7 +304,8 @@ export default function Dashboard() {
                   style={{ filter: "drop-shadow(0px 4px 6px rgba(16, 185, 129, 0.3))" }}
                 />
               </LineChart>
-            </ResponsiveContainer>
+              </ResponsiveContainer>
+            )}
           </div>
         </motion.div>
 
@@ -374,7 +378,7 @@ export default function Dashboard() {
                       animate={{ opacity: 1, y: 0, backgroundColor: "rgba(16, 185, 129, 0)" }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.4 }}
-                      className="hover:bg-slate-800/40 transition-colors group"
+                      className="group hover:bg-linear-to-r hover:from-emerald-500/15 hover:via-slate-800/40 hover:to-transparent transition-all duration-300 ease-out cursor-default relative"
                     >
                       <td className="px-6 py-5 text-slate-400 whitespace-nowrap font-medium">
                         {formatDistanceToNow(new Date(record.timestamp), { addSuffix: true })}
@@ -409,7 +413,7 @@ export default function Dashboard() {
                         </span>
                       </td>
                       <td className="px-6 py-5 whitespace-nowrap">
-                        <div className="flex items-center gap-2 font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20 w-fit">
+                        <div className="flex items-center gap-2 font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20 w-fit group-hover:bg-emerald-500/20 group-hover:border-emerald-500/50 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all duration-300">
                           +${record.amount} USDC
                           {record.txHash !== "unknown" && (
                             <a 
