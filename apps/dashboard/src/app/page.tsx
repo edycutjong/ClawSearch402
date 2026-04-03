@@ -157,7 +157,7 @@ export default function Dashboard() {
       {/* Header */}
       <motion.header variants={itemVariants} className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-3 bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400 drop-shadow-sm">
+          <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-3 bg-clip-text text-transparent bg-linear-to-r from-emerald-400 to-cyan-400 drop-shadow-sm">
             <motion.div 
                 animate={{ rotate: 360 }} 
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -219,8 +219,8 @@ export default function Dashboard() {
 
       <motion.div variants={containerVariants} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Chart */}
-        <motion.div variants={itemVariants} className="lg:col-span-2 bg-[var(--card)] backdrop-blur-md border border-[var(--border)] rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none" />
+        <motion.div variants={itemVariants} className="lg:col-span-2 bg-(--card) backdrop-blur-md border border-(--border) rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent pointer-events-none" />
           <div className="flex items-center justify-between mb-6 relative">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Activity className="w-5 h-5 text-cyan-400" />
@@ -232,7 +232,7 @@ export default function Dashboard() {
             </select>
           </div>
           <div className="h-[300px] w-full relative">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={300}>
               <LineChart data={chartData}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
@@ -286,8 +286,8 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Global Configuration */}
-        <motion.div variants={itemVariants} className="bg-[var(--card)] backdrop-blur-md border border-[var(--border)] rounded-2xl p-6 shadow-xl flex flex-col relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-bl from-cyan-500/5 to-transparent pointer-events-none transition-opacity duration-500 group-hover:opacity-100 opacity-50" />
+        <motion.div variants={itemVariants} className="bg-(--card) backdrop-blur-md border border-(--border) rounded-2xl p-6 shadow-xl flex flex-col relative overflow-hidden group">
+          <div className="absolute inset-0 bg-linear-to-bl from-cyan-500/5 to-transparent pointer-events-none transition-opacity duration-500 group-hover:opacity-100 opacity-50" />
           <h2 className="text-xl font-bold flex items-center gap-2 mb-6 text-white relative">
             <Settings className="w-5 h-5 text-emerald-400" />
             Network Details
@@ -313,7 +313,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Live Transaction Feed */}
-      <motion.div variants={itemVariants} className="bg-[var(--card)] backdrop-blur-xl border border-[var(--border)] rounded-2xl shadow-2xl overflow-hidden flex flex-col flex-1 min-h-[400px]">
+      <motion.div variants={itemVariants} className="bg-(--card) backdrop-blur-xl border border-(--border) rounded-2xl shadow-2xl overflow-hidden flex flex-col flex-1 min-h-[400px]">
         <div className="p-6 border-b border-slate-800/80 bg-slate-900/30 flex justify-between items-center">
           <h2 className="text-xl font-bold flex items-center gap-2 text-white">
             <Activity className="w-5 h-5 text-cyan-400" />
@@ -351,7 +351,7 @@ export default function Dashboard() {
                     <motion.tr
                       key={record.id}
                       initial={{ opacity: 0, y: -20, backgroundColor: "rgba(16, 185, 129, 0.1)" }}
-                      animate={{ opacity: 1, y: 0, backgroundColor: "transparent" }}
+                      animate={{ opacity: 1, y: 0, backgroundColor: "rgba(16, 185, 129, 0)" }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.4 }}
                       className="hover:bg-slate-800/40 transition-colors group"
@@ -437,9 +437,9 @@ function StatCard({
         show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
       }}
       whileHover={{ y: -5, scale: 1.02 }}
-      className="bg-[var(--card)] backdrop-blur-md border border-[var(--border)] rounded-2xl p-6 shadow-xl transition-all hover:shadow-cyan-500/10 hover:border-slate-600 relative overflow-hidden group"
+      className="bg-(--card) backdrop-blur-md border border-(--border) rounded-2xl p-6 shadow-xl transition-all hover:shadow-cyan-500/10 hover:border-slate-600 relative overflow-hidden group"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-br from-white/2 to-transparent pointer-events-none" />
       <div className="flex items-start justify-between relative">
         <div>
           <p className="text-slate-400 text-sm font-semibold tracking-wide mb-1 uppercase">{title}</p>
