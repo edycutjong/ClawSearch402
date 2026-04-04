@@ -232,7 +232,7 @@ app.get("/.well-known/x402", (_req, res) => {
     network: "stellar:testnet",
     routes: Object.entries(routes).map(([route, config]) => {
       const [method, path] = route.split(" ");
-      const paymentOption = Array.isArray(config.accepts) ? config.accepts[0] : config.accepts;
+      const paymentOption = config.accepts[0];
       return {
         method,
         path,
@@ -318,7 +318,7 @@ app.get("/api/events", sseHandler);
 
 // ── Start Server ─────────────────────────────────────────
 
-app.listen(PORT, () => {
+export const server = app.listen(PORT, () => {
   console.log("");
   console.log("  🔍 ClawSearch 402");
   console.log(`  ├─ Server:     http://localhost:${PORT}`);
@@ -334,3 +334,5 @@ app.listen(PORT, () => {
   console.log(`     GET /api/events                 → SSE stream`);
   console.log("");
 });
+
+export default app;

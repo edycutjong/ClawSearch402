@@ -80,10 +80,6 @@ async function searchSearXNG(query, { enriched = false } = {}) {
  * Search using Brave Search API
  */
 async function searchBrave(query, { enriched = false } = {}) {
-  if (!BRAVE_API_KEY) {
-    throw new Error("BRAVE_API_KEY is required for Brave Search provider");
-  }
-
   const params = new URLSearchParams({
     q: query,
     count: enriched ? "20" : "10",
