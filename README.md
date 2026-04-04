@@ -178,7 +178,7 @@ npm run agent "latest AI news" --enriched
 
 A pre-recorded demo video showcasing the full x402 payment flow is available:
 
-- 📹 **Video**: Rendered via [Remotion](https://remotion.dev) with voiceover narration
+- 📹 **Video**: [Watch on YouTube](https://youtu.be/8I-lEnUFYIs) (Rendered via [Remotion](https://remotion.dev) with voiceover narration)
 - 📸 **Screenshots**: Captured via Playwright automation (`scripts/graph-recorder.js`)
 
 The demo captures the real-time monetization of AI agent search queries:
