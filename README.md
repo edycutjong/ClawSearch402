@@ -175,7 +175,7 @@ npm run agent "latest AI news" --enriched
 
 <p align="center">
   <a href="https://youtu.be/8I-lEnUFYIs">
-    <img src="https://img.youtube.com/vi/8I-lEnUFYIs/maxresdefault.jpg" alt="ClawSearch 402 Live Revenue Spike (YouTube Demo)" width="100%">
+    <img src="https://img.youtube.com/vi/8I-lEnUFYIs/hqdefault.jpg" alt="ClawSearch 402 Live Revenue Spike (YouTube Demo)" width="100%">
   </a>
 </p>
 
