@@ -69,8 +69,8 @@ app.get("/search", async (req, res) => {
   const startTime = Date.now();
   const query = req.query.q;
 
-  if (!query) {
-    return res.status(400).json({ error: "Missing ?q= parameter" });
+  if (!query || typeof query !== "string" || query.length > 500) {
+    return res.status(400).json({ error: "Missing or invalid ?q= parameter (must be string <= 500 chars)" });
   }
 
   try {
@@ -138,8 +138,8 @@ app.get("/search/enriched", async (req, res) => {
   const startTime = Date.now();
   const query = req.query.q;
 
-  if (!query) {
-    return res.status(400).json({ error: "Missing ?q= parameter" });
+  if (!query || typeof query !== "string" || query.length > 500) {
+    return res.status(400).json({ error: "Missing or invalid ?q= parameter (must be string <= 500 chars)" });
   }
 
   try {
