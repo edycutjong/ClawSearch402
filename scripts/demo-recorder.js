@@ -1,86 +1,174 @@
 const { chromium } = require('playwright');
-const http = require('http');
+const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const PROXY_URL = "http://localhost:3001";
-const DASHBOARD_URL = "http://localhost:3000";
+const DASHBOARD_URL = process.env.DASHBOARD_URL || "http://localhost:3000";
+const AGENT_DIR = path.join(__dirname, '..', 'clients', 'node');
 
-const QUERIES = [
-  "latest crypto news",
-  "ethereum gas fees",
-  "x402 payment protocol",
-  "autonomous ai agents",
-  "machine to machine economy",
-  "stellar usdc smart contracts",
-  "decentralized micropayments",
-  "agentic workflow patterns"
-];
+const OUTPUT_DIR = path.join(__dirname, '..', 'demo_output');
+const SCREENSHOTS_DIR = path.join(OUTPUT_DIR, 'screenshots');
+const VIDEOS_DIR = path.join(OUTPUT_DIR, 'videos');
 
-async function fireBurst() {
-  console.log("🚀 Firing Agentic Traffic Burst...");
-  for (let i = 0; i < 15; i++) {
-    const q = QUERIES[Math.floor(Math.random() * QUERIES.length)];
-    const endpoint = Math.random() > 0.5 ? "/search/enriched" : "/search";
-    
-    // Fire and forget
-    http.get(`${PROXY_URL}${endpoint}?q=${encodeURIComponent(q)}`).on('error', () => {});
-    console.log(`🤖 [Agent ${i + 1}] Sent $0.00${endpoint.includes('enriched') ? '5' : '1'} USDC for: ${q}`);
-    
-    // Random sleep 400ms - 1500ms to mimic staggered requests
-    const delay = Math.floor(Math.random() * 1100) + 400;
-    await new Promise(resolve => setTimeout(resolve, delay));
-  }
+// Create output directories
+for (const dir of [OUTPUT_DIR, SCREENSHOTS_DIR, VIDEOS_DIR]) {
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+}
+
+/**
+ * Spawns the agent client in demo mode (10 real x402 queries).
+ * Returns a Promise that resolves when the agent finishes.
+ */
+function spawnAgentBurst() {
+  return new Promise((resolve, reject) => {
+    console.log("🤖 Spawning agent client (--demo) with real x402 payments...\n");
+
+    const agent = spawn('node', ['index.js', '--demo'], {
+      cwd: AGENT_DIR,
+      stdio: 'inherit',  // Stream agent output to our terminal
+      env: { ...process.env }
+    });
+
+    agent.on('close', (code) => {
+      if (code === 0) {
+        console.log("\n🤖 Agent burst complete!");
+        resolve();
+      } else {
+        reject(new Error(`Agent exited with code ${code}`));
+      }
+    });
+
+    agent.on('error', reject);
+  });
 }
 
 (async () => {
-  const videosDir = path.join(__dirname, '..', 'demo_videos');
-  if (!fs.existsSync(videosDir)) {
-    fs.mkdirSync(videosDir);
-  }
+  console.log("🎬 ClawSearch 402 — Demo Recorder\n");
+  console.log("═══════════════════════════════════════════\n");
 
-  console.log("🎬 Setting up Playwright recorder...");
   try {
-    // Launch chromium. headless: false shows the UI but is required for some visual accuracy, 
-    // though Playwright captures off-screen perfectly.
+    // ── Launch Playwright ──────────────────────────────────
+    console.log("🌐 Launching browser...");
     const browser = await chromium.launch({ headless: true });
-    
+
     const context = await browser.newContext({
       recordVideo: {
-        dir: videosDir,
+        dir: VIDEOS_DIR,
         size: { width: 1920, height: 1080 }
       },
       viewport: { width: 1920, height: 1080 },
       colorScheme: 'dark',
-      deviceScaleFactor: 2 // Retina high quality output
+      deviceScaleFactor: 2
     });
-    
+
     const page = await context.newPage();
-    
-    console.log(`🌐 Opening Next.js Dashboard: ${DASHBOARD_URL}`);
-    await page.goto(DASHBOARD_URL, { waitUntil: 'networkidle' });
-    
-    // Give it 2 seconds to finish any initial fetch and React hydration
+
+    // ── Load Dashboard ─────────────────────────────────────
+    console.log(`📊 Opening dashboard: ${DASHBOARD_URL}`);
+    await page.goto(DASHBOARD_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(2000);
-    
-    // Switch to "30m" view so the graph responds dynamically to bursts
-    await page.selectOption('select', '30m');
-    console.log("⏱️ Switched view to 'Last 30 Min' mode.");
-    
-    console.log("🎥 Recording started! Simulating traffic...");
+
+    // Screenshot 1: Dashboard idle state
+    await page.screenshot({
+      path: path.join(SCREENSHOTS_DIR, '01_dashboard_idle.png'),
+      fullPage: true
+    });
+    console.log("📸 Screenshot 1: Dashboard idle state");
+
+    // ── Try switching time window for better visual ────────
+    try {
+      // Try selecting 30m view for dynamic graph response
+      const selectExists = await page.locator('select').count();
+      if (selectExists > 0) {
+        await page.selectOption('select', '30m');
+        console.log("⏱️  Switched to '30m' view");
+      }
+    } catch {
+      console.log("⏱️  No time selector found, continuing...");
+    }
+
     await page.waitForTimeout(1000);
-    
-    // Start firing burst while the page is being recorded
-    await fireBurst();
-    
-    console.log("⏳ Letting the graph resolve animations for 5 more seconds...");
+
+    // Screenshot 2: Dashboard ready (before traffic)
+    await page.screenshot({
+      path: path.join(SCREENSHOTS_DIR, '02_dashboard_ready.png'),
+      fullPage: true
+    });
+    console.log("📸 Screenshot 2: Dashboard ready state");
+
+    // ── Fire Agent Traffic ──────────────────────────────────
+    console.log("\n🚀 Starting agent traffic burst...\n");
+
+    // Start the agent in parallel — dashboard will update via SSE
+    const agentPromise = spawnAgentBurst();
+
+    // Take mid-burst screenshots
+    await new Promise(r => setTimeout(r, 4000));
+    await page.screenshot({
+      path: path.join(SCREENSHOTS_DIR, '03_dashboard_mid_burst.png'),
+      fullPage: true
+    });
+    console.log("📸 Screenshot 3: Mid-burst (traffic flowing)");
+
+    // Wait for agent to finish
+    await agentPromise;
+
+    // ── Post-burst captures ────────────────────────────────
+    await page.waitForTimeout(2000);
+    await page.screenshot({
+      path: path.join(SCREENSHOTS_DIR, '04_dashboard_post_burst.png'),
+      fullPage: true
+    });
+    console.log("📸 Screenshot 4: Post-burst (all payments settled)");
+
+    // Scroll to the ledger table
+    try {
+      await page.evaluate(() => {
+        const ledger = document.querySelector('table') ||
+                       document.querySelector('[class*="ledger"]') ||
+                       document.querySelector('[class*="payment"]');
+        if (ledger) ledger.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      await page.waitForTimeout(1500);
+    } catch {
+      // Scroll to bottom as fallback
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await page.waitForTimeout(1000);
+    }
+
+    await page.screenshot({
+      path: path.join(SCREENSHOTS_DIR, '05_payment_ledger.png'),
+      fullPage: true
+    });
+    console.log("📸 Screenshot 5: Payment Ledger detail");
+
+    // ── Let graph animations finish ────────────────────────
+    console.log("\n⏳ Letting animations resolve (5s)...");
     await page.waitForTimeout(5000);
-    
+
+    // ── Close & save video ─────────────────────────────────
     await context.close();
     await browser.close();
-    
-    console.log(`✅ Demo recording complete! Video saved in: ${videosDir}`);
+
+    // List output files
+    console.log("\n═══════════════════════════════════════════");
+    console.log("✅ Demo recording complete!\n");
+    console.log("📁 Output:");
+
+    const screenshots = fs.readdirSync(SCREENSHOTS_DIR);
+    for (const f of screenshots) {
+      console.log(`   📸 ${path.join('demo_output/screenshots', f)}`);
+    }
+
+    const videos = fs.readdirSync(VIDEOS_DIR);
+    for (const f of videos) {
+      console.log(`   🎥 ${path.join('demo_output/videos', f)}`);
+    }
+
+    console.log("");
+
   } catch (err) {
-    console.error("Failed to run demo:", err);
+    console.error("❌ Demo recorder failed:", err.message);
+    process.exit(1);
   }
 })();
