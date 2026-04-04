@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/Currency-USDC-2775CA" alt="USDC">
   <img src="https://img.shields.io/badge/Node-22+-339933?logo=node.js&logoColor=white" alt="Node 22+">
   <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js 16">
+  <img src="https://img.shields.io/badge/Coverage-100%25-brightgreen.svg" alt="Coverage: 100%">
 </p>
 
 ---
