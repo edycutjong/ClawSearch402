@@ -46,5 +46,10 @@ coverage/
 # Turbo
 .turbo
 
-# Demo Videos
+# Demo output (raw recordings & screenshots — curated assets go in docs/)
+demo_output/
 demo_videos/
+
+# Lock files from sub-packages (root lock is tracked)
+apps/*/package-lock.json
+clients/*/package-lock.json
