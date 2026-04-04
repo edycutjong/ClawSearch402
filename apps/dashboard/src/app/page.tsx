@@ -78,6 +78,11 @@ export default function Dashboard() {
       setActiveClients(data.clients);
     });
 
+    evtSource.addEventListener("clients_update", (e) => {
+      const data = JSON.parse(e.data);
+      setActiveClients(data.clients);
+    });
+
     evtSource.addEventListener("payment", (e) => {
       const payment: PaymentRecord = JSON.parse(e.data);
 

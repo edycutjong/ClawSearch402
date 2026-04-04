@@ -6,6 +6,21 @@
 const clients = new Set();
 
 /**
+ * Broadcast current client count to all connected clients
+ */
+function broadcastClientCount() {
+  const data = JSON.stringify({ clients: clients.size });
+  const message = `event: clients_update\ndata: ${data}\n\n`;
+  for (const client of clients) {
+    try {
+      client.write(message);
+    } catch {
+      // Ignore errs
+    }
+  }
+}
+
+/**
  * SSE connection handler — attach to GET /api/events
  */
 export function sseHandler(req, res) {
@@ -15,11 +30,12 @@ export function sseHandler(req, res) {
     Connection: "keep-alive",
   });
 
-  // Send initial connection event
+  // Send initial connection event to just this client
   res.write(`event: connected\ndata: ${JSON.stringify({ status: "connected", clients: clients.size + 1 })}\n\n`);
 
   clients.add(res);
   console.log(`  📡 SSE client connected (${clients.size} total)`);
+  broadcastClientCount(); // Notify all clients
 
   // Send heartbeat every 30s to keep connection alive
   const heartbeat = setInterval(() => {
@@ -30,6 +46,7 @@ export function sseHandler(req, res) {
     clients.delete(res);
     clearInterval(heartbeat);
     console.log(`  📡 SSE client disconnected (${clients.size} remaining)`);
+    broadcastClientCount(); // Notify all clients
   });
 }
 
