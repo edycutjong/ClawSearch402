@@ -146,6 +146,7 @@ export default function Dashboard() {
       
       recent.forEach(r => {
         const key = format(new Date(r.timestamp), "HH:00");
+        /* v8 ignore next 3 -- all 24 HH:00 keys are pre-created, falsy branch unreachable */
         if (buckets[key] !== undefined) {
           buckets[key] += r.amount;
         }
