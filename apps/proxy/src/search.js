@@ -12,6 +12,16 @@ const SEARCH_PROVIDER = process.env.SEARCH_PROVIDER || "searxng";
 const cache = new Map();
 const CACHE_TTL = 5 * 60 * 1000;
 
+// Active sweep to prevent memory leaks from unused entries
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of cache.entries()) {
+    if (now - entry.time > CACHE_TTL) {
+      cache.delete(key);
+    }
+  }
+}, 60 * 1000).unref(); // Run every 1 minute, don't block event loop
+
 function getCached(key) {
   const entry = cache.get(key);
   if (!entry) return null;
