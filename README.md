@@ -231,6 +231,10 @@ flowchart LR
     Proxy -- "Search Results" --> Agent
     
     Proxy -.->|"SSE Events"| Dashboard
+    
+    %% Spacer to prevent GitHub's zoom controls from overlapping the Dashboard node
+    Dashboard ~~~ Spacer[ ]
+    style Spacer fill:none,stroke:none
 ```
 
 1. **Agent requests** `GET /search?q=...`
